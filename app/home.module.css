@@ -459,10 +459,69 @@
 .footerLink:hover { text-decoration: underline; }
 
 /* ─── Responsive ─────────────────────────────────── */
-@media (max-width: 900px) {
-  .statsInner { grid-template-columns: repeat(2, 1fr); }
-  .statItem { border-right: none; border-bottom: 1px solid var(--lm-border); padding: 20px; }
-  .statItem:nth-child(odd) { border-right: 1px solid var(--lm-border); }
-  .featGrid { grid-template-columns: 1fr; }
+
+/* Tablet (≤ 1024px) */
+@media (max-width: 1024px) {
+  .featGrid { grid-template-columns: repeat(2, 1fr); }
+  .heroMockup { max-width: 100%; }
+}
+
+/* Mobile (≤ 640px) */
+@media (max-width: 640px) {
+  /* Nav */
+  .navInner { padding: 0 16px; height: 56px; }
   .navLinks { display: none; }
+  .navBtn { padding: 8px 14px; font-size: 12px; }
+  .logoText { font-size: 16px; }
+
+  /* Hero */
+  .hero { padding: 48px 16px 40px; min-height: unset; }
+  .heroTitle { font-size: 30px; letter-spacing: -0.5px; }
+  .heroGradient { font-size: inherit; }
+  .heroSub { font-size: 15px; }
+  .heroBadge { font-size: 11px; padding: 5px 10px; }
+  .heroCtas { flex-direction: column; width: 100%; }
+  .ctaPrimary { width: 100%; justify-content: center; padding: 14px 20px; }
+  .ctaSecondary { text-align: center; }
+
+  /* Mockup — only 1 pump on mobile */
+  .heroMockup { border-radius: 10px; }
+  .mockupUrl { font-size: 10px; }
+  .heroMockup [data-pump="1"],
+  .heroMockup [data-pump="2"] { display: none; }
+
+
+  /* Stats — 2x2 grid */
+  .statsInner {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 24px 16px;
+    gap: 0;
+  }
+  .statItem {
+    padding: 16px 12px;
+    border-right: 1px solid var(--lm-border);
+    border-bottom: 1px solid var(--lm-border);
+  }
+  .statItem:nth-child(2) { border-right: none; }
+  .statItem:nth-child(3) { border-bottom: none; }
+  .statItem:nth-child(4) { border-right: none; border-bottom: none; }
+  .statValue { font-size: 28px; }
+
+  /* Features */
+  .features { padding: 56px 16px; }
+  .featGrid { grid-template-columns: 1fr; gap: 12px; }
+  .featCard { padding: 20px; }
+  .sectionTitle { font-size: 24px; letter-spacing: -0.3px; }
+  .sectionSub { font-size: 14px; }
+
+  /* Final CTA */
+  .finalCta { padding: 60px 16px; }
+  .finalTitle { font-size: 24px; }
+  .finalSub { font-size: 14px; }
+
+  /* Footer */
+  .footer { padding: 20px 16px; }
+  .footerInner { flex-direction: column; gap: 10px; text-align: center; }
+  .footerText { order: 1; }
+  .footerLink { order: 2; }
 }

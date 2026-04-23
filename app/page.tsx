@@ -5,7 +5,7 @@ import styles from './home.module.css';
 
 export const metadata: Metadata = {
   title: 'SurtOS — El sistema operativo de tu estación de servicio',
-  description: 'Plataforma SaaS de gestión en tiempo real para estaciones de servicio. Control de surtidores Gilbarco Veeder-Root, stock de tanques y despachos desde cualquier dispositivo.',
+  description: 'Plataforma SaaS de gestión en tiempo real para estaciones de servicio. Control de surtidores, stock de tanques y despachos desde cualquier dispositivo.',
 };
 
 const features = [
@@ -31,8 +31,8 @@ const features = [
   },
   {
     icon: '🔌',
-    title: 'Compatible con Gilbarco',
-    desc: 'Diseñado para surtidores PMD-4821 y PMD-2421 (Óctupla y Cuádrupla) con controladora VOX.',
+    title: 'Compatible con tu hardware',
+    desc: 'Soporte para surtidores PMD-4821 y PMD-2421 (Óctupla y Cuádrupla) con controladora VOX.',
   },
   {
     icon: '☁️',
@@ -62,7 +62,6 @@ export default function HomePage() {
           </div>
           <div className={styles.navLinks}>
             <a href="#features">Funciones</a>
-            <a href="#contact">Contacto</a>
           </div>
           <Link href="/login" className={styles.navBtn}>
             Ingresar al sistema →
@@ -89,7 +88,7 @@ export default function HomePage() {
           </h1>
 
           <p className={styles.heroSub}>
-            Gestioná surtidores Gilbarco en tiempo real, controlá el stock de combustible
+            Gestioná tus surtidores en tiempo real, controlá el stock de combustible
             y auditá cada despacho — desde cualquier dispositivo, en la nube.
           </p>
 
@@ -138,7 +137,7 @@ export default function HomePage() {
           <div className={styles.sectionBadge}>FUNCIONALIDADES</div>
           <h2 className={styles.sectionTitle}>Todo lo que necesitás, nada que no necesitás</h2>
           <p className={styles.sectionSub}>
-            Construido específicamente para el protocolo PAM 1000 de Gilbarco Veeder-Root.
+            Construido específicamente para estaciones de servicio con protocolo VOX sobre TCP/IP.
           </p>
           <div className={styles.featGrid}>
             {features.map(f => (
@@ -187,6 +186,7 @@ export default function HomePage() {
 
 /* ── Mini mockup dark preview ── */
 function MockPumps() {
+  // On mobile only show 1 pump; CSS hides the 3rd
   const mockPumps = [
     { n: 'Surtidor 1', nozzles: ['NS','NP','DS','DP'], state: ['LIBRE','LIBRE','DESPACHANDO','LIBRE'] },
     { n: 'Surtidor 2', nozzles: ['NS','NP','DS','DP'], state: ['LIBRE','AUTORIZADO','LIBRE','LIBRE'] },
@@ -195,11 +195,12 @@ function MockPumps() {
   const stateColor: Record<string,string> = { LIBRE: '#4B5C73', DESPACHANDO: '#3B82F6', AUTORIZADO: '#EAB308' };
   const fuelColor: Record<string,string> = { NS: '#10B981', NP: '#3B82F6', DS: '#F59E0B', DP: '#A855F7' };
   return (
-    <div style={{ padding: '16px', display: 'flex', gap: 12 }}>
+    <div style={{ padding: '16px', display: 'flex', gap: 12, overflowX: 'hidden' }}>
       {mockPumps.map((p, i) => (
-        <div key={i} style={{
-          flex: 1, background: '#0F1829', borderRadius: 8,
+        <div key={i} data-pump={i > 0 ? String(i) : undefined} style={{
+          flex: 1, minWidth: 0, background: '#0F1829', borderRadius: 8,
           border: '1px solid rgba(255,255,255,0.06)', padding: '10px 12px',
+          display: 'flex', flexDirection: 'column',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <div style={{
