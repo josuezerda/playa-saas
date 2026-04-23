@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from './home.module.css';
 
 export const metadata: Metadata = {
@@ -54,14 +55,13 @@ export default function HomePage() {
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <div className={styles.logo}>
-            <SurtOSIcon />
+            <Image src="/logo.svg" alt="SurtOS Logo" width={34} height={34} />
             <span className={styles.logoText}>
               Surt<span className={styles.logoOS}>OS</span>
             </span>
           </div>
           <div className={styles.navLinks}>
             <a href="#features">Funciones</a>
-            <a href="#pricing">Precios</a>
             <a href="#contact">Contacto</a>
           </div>
           <Link href="/login" className={styles.navBtn}>
@@ -72,26 +72,27 @@ export default function HomePage() {
 
       {/* ── Hero ── */}
       <section className={styles.hero}>
-        {/* Background decorations */}
         <div className={styles.heroGrid} />
         <div className={styles.heroOrb1} />
         <div className={styles.heroOrb2} />
-        <div className={styles.heroOrb3} />
 
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}>
             <span className={styles.heroBadgeDot} />
             Sistema activo · VOX Forecourt Controller
           </div>
+
           <h1 className={styles.heroTitle}>
             El sistema operativo
             <br />
             <span className={styles.heroGradient}>de tu estación de servicio</span>
           </h1>
+
           <p className={styles.heroSub}>
             Gestioná surtidores Gilbarco en tiempo real, controlá el stock de combustible
             y auditá cada despacho — desde cualquier dispositivo, en la nube.
           </p>
+
           <div className={styles.heroCtas}>
             <Link href="/login" className={styles.ctaPrimary}>
               ⚡ Acceder a la Terminal
@@ -101,13 +102,13 @@ export default function HomePage() {
             </a>
           </div>
 
-          {/* Live preview mockup */}
+          {/* Live dashboard preview */}
           <div className={styles.heroMockup}>
             <div className={styles.mockupBar}>
               <div className={styles.mockupDots}>
                 <span /><span /><span />
               </div>
-              <div className={styles.mockupUrl}>surtos.app/dashboard</div>
+              <div className={styles.mockupUrl}>surtos.com.ar/dashboard</div>
               <div className={styles.mockupLive}>
                 <span className={styles.liveDot} />LIVE
               </div>
@@ -139,7 +140,6 @@ export default function HomePage() {
           <p className={styles.sectionSub}>
             Construido específicamente para el protocolo PAM 1000 de Gilbarco Veeder-Root.
           </p>
-
           <div className={styles.featGrid}>
             {features.map(f => (
               <div key={f.title} className={styles.featCard}>
@@ -152,59 +152,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Pricing ── */}
-      <section id="pricing" className={styles.pricing}>
-        <div className={styles.sectionInner}>
-          <div className={styles.sectionBadge}>PRECIOS</div>
-          <h2 className={styles.sectionTitle}>Simple y transparente</h2>
-          <div className={styles.pricingGrid}>
-            {[
-              {
-                name: 'Estación',
-                price: '$0',
-                period: '/mes',
-                desc: 'Para una sola estación.',
-                features: ['Hasta 6 surtidores', 'Dashboard en tiempo real', 'Control de stock', '1 operador'],
-                cta: 'Empezar gratis',
-                highlight: false,
-              },
-              {
-                name: 'Pro',
-                price: 'Consultar',
-                period: '',
-                desc: 'Para cadenas y distribuidoras.',
-                features: ['Estaciones ilimitadas', 'Multi-operador', 'API pública', 'Soporte prioritario', 'Reportes avanzados'],
-                cta: 'Contactar ventas',
-                highlight: true,
-              },
-            ].map(plan => (
-              <div key={plan.name} className={`${styles.planCard} ${plan.highlight ? styles.planHighlight : ''}`}>
-                {plan.highlight && <div className={styles.planBadge}>RECOMENDADO</div>}
-                <div className={styles.planName}>{plan.name}</div>
-                <div className={styles.planPrice}>
-                  {plan.price}<span>{plan.period}</span>
-                </div>
-                <div className={styles.planDesc}>{plan.desc}</div>
-                <ul className={styles.planFeatures}>
-                  {plan.features.map(f => (
-                    <li key={f}><span className={styles.check}>✓</span> {f}</li>
-                  ))}
-                </ul>
-                <Link href="/login" className={plan.highlight ? styles.ctaPrimary : styles.ctaSecondary}>
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── CTA Final ── */}
       <section className={styles.finalCta}>
         <div className={styles.finalCtaInner}>
+          <Image src="/logo.svg" alt="SurtOS" width={52} height={52} style={{ marginBottom: 8 }} />
           <h2 className={styles.finalTitle}>¿Listo para modernizar tu estación?</h2>
           <p className={styles.finalSub}>
-            Empezá hoy. Sin tarjeta de crédito, sin instalaciones.
+            Sin instalaciones. Sin servidores locales. Acceso inmediato.
           </p>
           <Link href="/login" className={styles.ctaPrimary}>
             ⚡ Ingresá ahora
@@ -216,7 +170,7 @@ export default function HomePage() {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div className={styles.logo}>
-            <SurtOSIcon size={20} />
+            <Image src="/logo.svg" alt="SurtOS" width={22} height={22} />
             <span className={styles.logoText} style={{ fontSize: 14 }}>
               Surt<span className={styles.logoOS}>OS</span>
             </span>
@@ -231,34 +185,15 @@ export default function HomePage() {
   );
 }
 
-/* ── SVG Logo Icon ── */
-function SurtOSIcon({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="8" fill="#1D4ED8" />
-      {/* Fuel nozzle body */}
-      <rect x="8" y="10" width="4" height="14" rx="2" fill="white" />
-      {/* Nozzle tip */}
-      <path d="M12 14h8a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-8v-6z" fill="white" />
-      {/* Green dot = connected */}
-      <circle cx="23" cy="10" r="3" fill="#10B981" />
-    </svg>
-  );
-}
-
-/* ── Mini mockup of the dashboard ── */
+/* ── Mini mockup dark preview ── */
 function MockPumps() {
   const mockPumps = [
     { n: 'Surtidor 1', nozzles: ['NS','NP','DS','DP'], state: ['LIBRE','LIBRE','DESPACHANDO','LIBRE'] },
     { n: 'Surtidor 2', nozzles: ['NS','NP','DS','DP'], state: ['LIBRE','AUTORIZADO','LIBRE','LIBRE'] },
     { n: 'Surtidor 3', nozzles: ['NS','NP','DS','DP'], state: ['LIBRE','LIBRE','LIBRE','LIBRE'] },
   ];
-  const stateColor: Record<string,string> = {
-    LIBRE: '#4B5C73', DESPACHANDO: '#3B82F6', AUTORIZADO: '#EAB308',
-  };
-  const fuelColor: Record<string,string> = {
-    NS: '#10B981', NP: '#3B82F6', DS: '#F59E0B', DP: '#A855F7',
-  };
+  const stateColor: Record<string,string> = { LIBRE: '#4B5C73', DESPACHANDO: '#3B82F6', AUTORIZADO: '#EAB308' };
+  const fuelColor: Record<string,string> = { NS: '#10B981', NP: '#3B82F6', DS: '#F59E0B', DP: '#A855F7' };
   return (
     <div style={{ padding: '16px', display: 'flex', gap: 12 }}>
       {mockPumps.map((p, i) => (
@@ -281,10 +216,7 @@ function MockPumps() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ fontSize: 10, color: '#4B5C73', fontFamily: 'monospace' }}>{j+1}</span>
-                <span style={{
-                  background: fuelColor[fuel], padding: '1px 5px', borderRadius: 3,
-                  fontSize: 9, fontWeight: 700, color: 'white',
-                }}>{fuel}</span>
+                <span style={{ background: fuelColor[fuel], padding: '1px 5px', borderRadius: 3, fontSize: 9, fontWeight: 700, color: 'white' }}>{fuel}</span>
               </div>
               <span style={{ fontSize: 9, color: stateColor[p.state[j]] ?? '#4B5C73', fontWeight: 500 }}>
                 {p.state[j] === 'DESPACHANDO' && '● '}
