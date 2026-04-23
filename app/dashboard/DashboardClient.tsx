@@ -285,7 +285,7 @@ export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail }: Pro
           <div>
             <h1 className={styles.logoTitle}>
               Módulo Playa <span>Estación de Servicio —</span>{' '}
-              <span className={styles.logoGreen}>Gilbarco Veeder-Root</span>
+              <span className={styles.logoGreen}>Segon srl</span>
             </h1>
             <div className={styles.logoSub}>
               VOX Forecourt Controller · Protocolo PAM 1000 · TCP/IP · {pumps.length} Surtidores
