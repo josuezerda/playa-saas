@@ -1,0 +1,464 @@
+/* ─── App Shell ──────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── Header ─────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logoIcon {
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  flex-shrink: 0;
+}
+
+.logoTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.logoTitle span {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.logoGreen { color: #10B981 !important; }
+
+.logoSub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #10B981;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badgeRed {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #EF4444;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.clock {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 70px;
+  text-align: right;
+}
+
+.iconBtn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 9px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.iconBtn:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-primary);
+}
+
+/* ─── Body ───────────────────────────────────────── */
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ─── Pumps Section ──────────────────────────────── */
+.pumpsSection {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.groupTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.pumpGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 14px;
+}
+
+/* ─── Pump Card ──────────────────────────────────── */
+.pumpCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color 0.2s;
+}
+
+.pumpCard:hover {
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.pumpBlocked {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.pumpHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pumpBadge {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.pumpTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pumpModel {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.pumpFaces {
+  display: flex;
+  gap: 12px;
+}
+
+.face {
+  flex: 1;
+  min-width: 0;
+}
+
+.faceLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.faceLabelRight {
+  text-align: right;
+}
+
+.nozzles {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 2px 10px;
+}
+
+/* ─── Nozzle Row ─────────────────────────────────── */
+.nozzleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s;
+}
+
+.nozzleRow:last-child { border-bottom: none; }
+
+.nozzleActive {
+  background: rgba(59, 130, 246, 0.04);
+  border-radius: 4px;
+  margin: 0 -6px;
+  padding: 6px 6px;
+}
+
+.nozzleLeft {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.nozzleNum {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 10px;
+}
+
+.fuelBadge {
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.3px;
+}
+
+.nozzleState {
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pulse {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  animation: pulsate 1.2s ease-in-out infinite;
+}
+
+@keyframes pulsate {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+/* ─── Sidebar ────────────────────────────────────── */
+.sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 20px 24px 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.glass {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.sidePanel {
+  padding: 16px;
+}
+
+.sidePanelFlex {
+  flex: 1;
+  min-height: 0;
+}
+
+.panelTitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 12px;
+}
+
+/* Sim panel */
+.btnSim {
+  width: 100%;
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  transition: all 0.2s;
+}
+
+.btnSim:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.legendDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.simNotes {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.5;
+}
+
+/* Turn stats */
+.statList {
+  display: flex;
+  flex-direction: column;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.statRow:last-child { border-bottom: none; }
+
+.statLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.statVal {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.accent { color: var(--accent); font-weight: 600; }
+
+/* Stock */
+.stockList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stockItem {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.stockInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stockLabel {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.stockVol {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.progressBg {
+  height: 5px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px;
+  color: var(--text-muted);
+  text-align: center;
+}
