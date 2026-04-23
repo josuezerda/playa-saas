@@ -44,7 +44,6 @@ body {
   background-color: var(--bg-app);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
 }
 
 /* Scrollbar */
