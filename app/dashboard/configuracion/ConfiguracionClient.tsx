@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Save, CheckCircle2, Building2, MapPin, Phone, Hash } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Save, CheckCircle2, Building2, MapPin, Phone, Hash, ImagePlus, Upload } from 'lucide-react';
 import styles from '../dashboard.module.css';
 
 export default function ConfiguracionClient({ tenant, tenantParam, isSuperadmin }: { tenant: any; tenantParam?: string; isSuperadmin?: boolean }) {
@@ -16,6 +16,13 @@ export default function ConfiguracionClient({ tenant, tenantParam, isSuperadmin 
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+
+  // Logo state
+  const [logoPreview, setLogoPreview] = useState<string>(tenant?.logo_url || '');
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoSaved, setLogoSaved] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handle = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(p => ({ ...p, [e.target.name]: e.target.value }));
@@ -37,6 +44,40 @@ export default function ConfiguracionClient({ tenant, tenantParam, isSuperadmin 
       setError(e.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setLogoPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const uploadLogo = async () => {
+    if (!logoFile) return;
+    setLogoUploading(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('file', logoFile);
+      formData.append('tenant_id', tenant.id);
+      const res = await fetch('/api/tenants/logo', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setLogoPreview(data.logo_url);
+      setLogoFile(null);
+      setLogoSaved(true);
+      setTimeout(() => setLogoSaved(false), 3000);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLogoUploading(false);
     }
   };
 
@@ -74,6 +115,98 @@ export default function ConfiguracionClient({ tenant, tenantParam, isSuperadmin 
 
       <div className={styles.body} style={{ padding: 30, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
         
+        {/* Logo de la Empresa */}
+        <div className={styles.glass} style={{ padding: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(168,85,247,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ImagePlus size={20} color="#A855F7" />
+            </div>
+            <div>
+              <h2 style={{ fontSize: 16, fontWeight: 700 }}>Logo de la Empresa</h2>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Imagen visible en el sistema y documentos generados.</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+            {/* Preview */}
+            <div
+              style={{
+                width: 120, height: 120, borderRadius: 16,
+                border: '2px dashed var(--border)',
+                background: 'var(--bg-panel)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                overflow: 'hidden', flexShrink: 0, cursor: 'pointer',
+                position: 'relative',
+              }}
+              onClick={() => fileInputRef.current?.click()}
+              title="Haz clic para cambiar el logo"
+            >
+              {logoPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={logoPreview}
+                  alt="Logo empresa"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8 }}
+                />
+              ) : (
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <ImagePlus size={28} style={{ margin: '0 auto 6px' }} />
+                  <div style={{ fontSize: 11 }}>Sin logo</div>
+                </div>
+              )}
+            </div>
+
+            {/* Controls */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                style={{ display: 'none' }}
+                onChange={handleLogoSelect}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                  border: '1px solid var(--border)', background: 'var(--bg-panel)',
+                  color: 'var(--text-primary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                }}
+              >
+                <ImagePlus size={15} />
+                {logoFile ? logoFile.name : 'Seleccionar imagen'}
+              </button>
+
+              {logoFile && (
+                <button
+                  onClick={uploadLogo}
+                  disabled={logoUploading}
+                  style={{
+                    padding: '9px 18px', borderRadius: 8, fontSize: 13, fontWeight: 600,
+                    background: '#A855F7', color: 'white', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 8, border: 'none',
+                    opacity: logoUploading ? 0.7 : 1,
+                  }}
+                >
+                  <Upload size={15} />
+                  {logoUploading ? 'Subiendo...' : 'Guardar logo'}
+                </button>
+              )}
+
+              {logoSaved && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#10B981', fontSize: 13, fontWeight: 600 }}>
+                  <CheckCircle2 size={15} /> Logo actualizado
+                </div>
+              )}
+
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                PNG, JPG, SVG o WebP · Máx. 2 MB<br />
+                Recomendado: fondo transparente, min. 200×200px
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Basic Info */}
         <div className={styles.glass} style={{ padding: 28 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
