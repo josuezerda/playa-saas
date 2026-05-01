@@ -4,20 +4,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-app:     #0B1121;
-  --bg-card:    #141C2F;
-  --bg-panel:   #1A2234;
-  --bg-input:   #0F1829;
+  --bg-app:     #F8FAFC;
+  --bg-card:    #FFFFFF;
+  --bg-panel:   #F1F5F9;
+  --bg-input:   #FFFFFF;
 
-  --border:     rgba(255, 255, 255, 0.07);
-  --border-focus: rgba(56, 189, 248, 0.5);
+  --border:     rgba(0, 0, 0, 0.08);
+  --border-focus: rgba(59, 130, 246, 0.5);
 
-  --text-primary:   #F1F5F9;
-  --text-secondary: #94A3B8;
-  --text-muted:     #4B5C73;
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
 
   --accent:      #3B82F6;
-  --accent-glow: rgba(59, 130, 246, 0.25);
+  --accent-glow: rgba(59, 130, 246, 0.15);
 
   --green:       #10B981;
   --yellow:      #EAB308;

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import styles from './admin.module.css';
+import NewTenantModal from './NewTenantModal';
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -45,7 +46,7 @@ export default async function AdminPage() {
       <main className={styles.main}>
         <div className={styles.pageTitle}>
           <h1>Empresas habilitadas</h1>
-          <button className={styles.btnPrimary}>+ Nueva empresa</button>
+          <NewTenantModal />
         </div>
 
         <div className={styles.tenantsGrid}>

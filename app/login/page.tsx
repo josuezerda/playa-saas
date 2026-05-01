@@ -19,15 +19,30 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: signInError, data } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) {
+    if (signInError) {
       setError('Email o contraseña incorrectos.');
       setLoading(false);
       return;
     }
 
-    router.push('/dashboard');
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (profile?.role === 'superadmin') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
+    } else {
+      router.push('/dashboard');
+    }
+
     router.refresh();
   };
 

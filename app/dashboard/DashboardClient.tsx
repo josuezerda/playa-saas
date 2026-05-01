@@ -48,6 +48,7 @@ interface Props {
   stockRaw: StockItem[];
   shiftRaw: Shift | null;
   userEmail: string;
+  tenantName: string;
 }
 
 /* ─── Fuel helpers ───────────────────────────────── */
@@ -252,7 +253,7 @@ function Sidebar({ stock, shift }: { stock: StockItem[]; shift: Shift | null }) 
 }
 
 /* ─── Main Dashboard ─────────────────────────────── */
-export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail }: Props) {
+export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail, tenantName }: Props) {
   const [pumps, setPumps] = useState<Pump[]>(pumpsRaw);
   const [connected, setConnected] = useState(true);
   const [time, setTime] = useState('');
@@ -285,7 +286,7 @@ export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail }: Pro
           <div>
             <h1 className={styles.logoTitle}>
               Módulo Playa <span>Estación de Servicio —</span>{' '}
-              <span className={styles.logoGreen}>Segon srl</span>
+              <span className={styles.logoGreen}>{tenantName || 'Global'}</span>
             </h1>
             <div className={styles.logoSub}>
               VOX Forecourt Controller · Protocolo PAM 1000 · TCP/IP · {pumps.length} Surtidores
