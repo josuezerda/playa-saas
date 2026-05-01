@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Save, CheckCircle2, Building2, MapPin, Phone, Hash } from 'lucide-react';
 import styles from '../dashboard.module.css';
 
-export default function ConfiguracionClient({ tenant, tenantParam }: { tenant: any; tenantParam?: string }) {
+export default function ConfiguracionClient({ tenant, tenantParam, isSuperadmin }: { tenant: any; tenantParam?: string; isSuperadmin?: boolean }) {
   const [form, setForm] = useState({
     name: tenant?.name || '',
     slug: tenant?.slug || '',
@@ -106,28 +106,30 @@ export default function ConfiguracionClient({ tenant, tenantParam }: { tenant: a
           </div>
         </div>
 
-        {/* Plan */}
-        <div className={styles.glass} style={{ padding: 28 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Plan Activo</h2>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>El plan determina el límite de estaciones, usuarios y funcionalidades.</p>
-          <div style={{ display: 'flex', gap: 14 }}>
-            {[
-              { value: 'basic', label: 'BÁSICO', desc: 'Hasta 2 estaciones\n5 usuarios\nSurtidores y stock', color: '#10B981', price: 'Gratis' },
-              { value: 'pro', label: 'PRO', desc: 'Hasta 10 estaciones\n20 usuarios\nFacturación AFIP\nCRM WhatsApp\nIA incluida', color: '#A855F7', price: '$15.000/mes' },
-            ].map(p => {
-              const selected = form.plan === p.value;
-              return (
-                <div key={p.value} onClick={() => setForm(f => ({ ...f, plan: p.value }))}
-                  style={{ flex: 1, padding: 20, borderRadius: 12, border: `2px solid ${selected ? p.color : 'var(--border)'}`,
-                    background: selected ? `${p.color}10` : 'var(--bg-panel)', cursor: 'pointer' }}>
-                  <div style={{ fontWeight: 800, fontSize: 16, color: p.color }}>{p.label}</div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>{p.price}</div>
-                  <pre style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 12, lineHeight: 1.7, fontFamily: 'inherit', whiteSpace: 'pre-wrap' }}>{p.desc}</pre>
-                </div>
-              );
-            })}
+        {/* Plan — solo visible para superadmin */}
+        {isSuperadmin && (
+          <div className={styles.glass} style={{ padding: 28 }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Plan Activo</h2>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>El plan determina el límite de estaciones, usuarios y funcionalidades.</p>
+            <div style={{ display: 'flex', gap: 14 }}>
+              {[
+                { value: 'basic', label: 'BÁSICO', desc: 'Hasta 2 estaciones\n5 usuarios\nSurtidores y stock', color: '#10B981', price: 'Gratis' },
+                { value: 'pro', label: 'PRO', desc: 'Hasta 10 estaciones\n20 usuarios\nFacturación AFIP\nCRM WhatsApp\nIA incluida', color: '#A855F7', price: '$15.000/mes' },
+              ].map(p => {
+                const selected = form.plan === p.value;
+                return (
+                  <div key={p.value} onClick={() => setForm(f => ({ ...f, plan: p.value }))}
+                    style={{ flex: 1, padding: 20, borderRadius: 12, border: `2px solid ${selected ? p.color : 'var(--border)'}`,
+                      background: selected ? `${p.color}10` : 'var(--bg-panel)', cursor: 'pointer' }}>
+                    <div style={{ fontWeight: 800, fontSize: 16, color: p.color }}>{p.label}</div>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>{p.price}</div>
+                    <pre style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 12, lineHeight: 1.7, fontFamily: 'inherit', whiteSpace: 'pre-wrap' }}>{p.desc}</pre>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Danger Zone */}
         <div style={{ padding: 24, borderRadius: 12, border: '1px solid rgba(239,68,68,0.25)', background: 'rgba(239,68,68,0.04)' }}>

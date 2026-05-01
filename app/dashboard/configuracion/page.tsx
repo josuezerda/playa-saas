@@ -27,5 +27,5 @@ export default async function ConfiguracionPage({ searchParams }: { searchParams
     .eq('id', activeTenantId)
     .single();
 
-  return <ConfiguracionClient tenant={tenant} tenantParam={resolvedParams?.tenant} />;
+  return <ConfiguracionClient tenant={tenant} tenantParam={resolvedParams?.tenant} isSuperadmin={profile?.role === 'superadmin'} />;
 }
