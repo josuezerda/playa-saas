@@ -79,9 +79,9 @@ export default async function AdminPage() {
               </div>
 
               <div className={styles.tenantActions}>
-                <Link href={`/dashboard?tenant=${tenant.id}`} className={styles.btnSmall}>
+                <a href={`/dashboard?tenant=${tenant.id}`} className={styles.btnSmall}>
                   Ver dashboard →
-                </Link>
+                </a>
                 <button className={`${styles.btnSmall} ${styles.btnToggle} ${tenant.active ? styles.btnDeactivate : styles.btnActivate}`}>
                   {tenant.active ? 'Desactivar' : 'Activar'}
                 </button>

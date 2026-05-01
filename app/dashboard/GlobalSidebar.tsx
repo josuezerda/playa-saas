@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Fuel, Users, Receipt, Link2, Settings } from 'lucide-react';
 import styles from './sidebar.module.css';
 
@@ -15,6 +15,9 @@ const NAV_ITEMS = [
 
 export default function GlobalSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tenantParam = searchParams.get('tenant');
+  const tenantQueryString = tenantParam ? `?tenant=${tenantParam}` : '';
 
   return (
     <aside className={styles.globalSidebar}>
@@ -26,11 +29,12 @@ export default function GlobalSidebar() {
       <nav className={styles.navMenu}>
         {NAV_ITEMS.map(item => {
           const isActive = pathname === item.href;
+          const hrefWithTenant = `${item.href}${tenantQueryString}`;
           const Icon = item.icon;
           return (
             <Link 
               key={item.href} 
-              href={item.href} 
+              href={hrefWithTenant} 
               className={`${styles.navItem} ${isActive ? styles.active : ''}`}
             >
               <Icon size={18} className={styles.navIcon} />

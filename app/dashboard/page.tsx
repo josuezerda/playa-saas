@@ -2,9 +2,10 @@ import { createClient } from '@/lib/supabase/server';
 import { DashboardClient } from './DashboardClient';
 import { redirect } from 'next/navigation';
 
-export default async function DashboardPage({ searchParams }: { searchParams: { tenant?: string } }) {
+export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const resolvedParams = await searchParams;
 
   let stationIds: number[] = [];
   let tenantName = '';
@@ -13,11 +14,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: { 
     const { data: profile } = await supabase.from('user_profiles').select('role, tenants(name)').eq('id', user.id).single();
     
     if (profile?.role === 'superadmin') {
-      if (!searchParams?.tenant) {
+      if (!resolvedParams?.tenant) {
         // Superadmin without tenant context should go to admin panel
         redirect('/admin');
       } else {
-        const { data: stations } = await supabase.from('stations').select('id, tenants(name)').eq('tenant_id', searchParams.tenant);
+        const { data: stations } = await supabase.from('stations').select('id, tenants(name)').eq('tenant_id', resolvedParams.tenant);
         if (stations && stations.length > 0) {
           stationIds = stations.map(s => s.id);
           // Assuming all stations here belong to the same tenant, we take the name from the first one
