@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import ConfiguracionClient from './ConfiguracionClient';
+import CrmClient from './CrmClient';
 
-export default async function ConfiguracionPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
+export default async function CrmPage({ searchParams }: { searchParams: Promise<{ tenant?: string }> }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const resolvedParams = await searchParams;
@@ -21,11 +21,25 @@ export default async function ConfiguracionPage({ searchParams }: { searchParams
 
   if (!activeTenantId) redirect('/login');
 
-  const { data: tenant } = await supabase
-    .from('tenants')
+  const { data: contacts } = await supabase
+    .from('crm_contacts')
     .select('*')
-    .eq('id', activeTenantId)
-    .single();
+    .eq('tenant_id', activeTenantId)
+    .order('created_at', { ascending: false });
 
-  return <ConfiguracionClient tenant={tenant} tenantParam={resolvedParams?.tenant} />;
+  const { data: campaigns } = await supabase
+    .from('crm_campaigns')
+    .select('*')
+    .eq('tenant_id', activeTenantId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  return (
+    <CrmClient
+      contactsInitial={contacts ?? []}
+      campaignsInitial={campaigns ?? []}
+      tenantId={activeTenantId}
+      tenantParam={resolvedParams?.tenant}
+    />
+  );
 }

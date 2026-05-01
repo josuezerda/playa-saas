@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Fuel, Users, Receipt, Link2, Settings } from 'lucide-react';
+import { Fuel, Users, Receipt, Link2, Settings, MessageSquare } from 'lucide-react';
 import styles from './sidebar.module.css';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Panel de Control', icon: Fuel },
   { href: '/dashboard/empleados', label: 'Empleados y Roles', icon: Users },
+  { href: '/dashboard/crm', label: 'CRM — Clientes', icon: MessageSquare },
   { href: '/dashboard/facturacion', label: 'Facturación AFIP', icon: Receipt },
   { href: '/dashboard/integraciones', label: 'Integraciones', icon: Link2 },
   { href: '/dashboard/configuracion', label: 'Configuración', icon: Settings },
