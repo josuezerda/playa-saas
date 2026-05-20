@@ -12,11 +12,20 @@ export async function PATCH(req: NextRequest) {
 
   if (!tenantId) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
 
-  const { data, error } = await supabase.from('tenants').update({
-    name: body.name,
-    cuit: body.cuit,
-    plan: body.plan,
-  }).eq('id', tenantId).select().single();
+  // Campos permitidos (whitelist para seguridad)
+  const allowed: Record<string, unknown> = {};
+  const fields = ['name','cuit','plan','address','phone','logo_url',
+                  'afip_punto_venta','afip_condition','afip_razon_social','afip_cert_status'];
+  for (const f of fields) {
+    if (body[f] !== undefined) allowed[f] = body[f];
+  }
+
+  const { data, error } = await supabase
+    .from('tenants')
+    .update(allowed)
+    .eq('id', tenantId)
+    .select()
+    .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true, data });

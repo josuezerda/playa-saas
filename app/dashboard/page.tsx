@@ -7,33 +7,52 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const { data: { user } } = await supabase.auth.getUser();
   const resolvedParams = await searchParams;
 
+  if (!user) redirect('/login');
+
   let stationIds: number[] = [];
   let tenantName = '';
+  let activeTenantId: number | null = null;
 
-  if (user) {
-    const { data: profile } = await supabase.from('user_profiles').select('role, tenants(name)').eq('id', user.id).single();
-    
-    if (profile?.role === 'superadmin') {
-      if (!resolvedParams?.tenant) {
-        // Superadmin without tenant context should go to admin panel
-        redirect('/admin');
-      } else {
-        const { data: stations } = await supabase.from('stations').select('id, tenants(name)').eq('tenant_id', resolvedParams.tenant);
-        if (stations && stations.length > 0) {
-          stationIds = stations.map(s => s.id);
-          // Assuming all stations here belong to the same tenant, we take the name from the first one
-          tenantName = (stations[0].tenants as any)?.name || '';
-        }
-      }
-    } else {
-      // Normal user, use their profile's tenant name
-      tenantName = (profile?.tenants as any)?.name || '';
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role, tenant_id, tenants(name, id)')
+    .eq('id', user.id)
+    .single();
+
+  if (profile?.role === 'superadmin') {
+    if (!resolvedParams?.tenant) redirect('/admin');
+    activeTenantId = parseInt(resolvedParams.tenant, 10);
+    const { data: stations } = await supabase
+      .from('stations')
+      .select('id, tenant_id, tenants(name)')
+      .eq('tenant_id', activeTenantId);
+    if (stations && stations.length > 0) {
+      stationIds = stations.map(s => s.id);
+      tenantName = (stations[0].tenants as any)?.name || '';
+    }
+  } else {
+    // Fix: para usuarios normales, buscar estaciones de su tenant
+    activeTenantId = profile?.tenant_id ?? null;
+    tenantName = (profile?.tenants as any)?.name || '';
+    if (activeTenantId) {
+      const { data: stations } = await supabase
+        .from('stations')
+        .select('id')
+        .eq('tenant_id', activeTenantId);
+      stationIds = stations?.map(s => s.id) ?? [];
     }
   }
 
+  if (!activeTenantId) redirect('/login');
+
   let pumpsQuery = supabase.from('pumps').select('*, nozzles(*)').order('position');
   let stockQuery = supabase.from('stock').select('*');
-  let shiftQuery = supabase.from('shifts').select('*').eq('status', 'OPEN').order('opened_at', { ascending: false }).limit(1);
+  let shiftQuery = supabase
+    .from('shifts')
+    .select('*')
+    .eq('status', 'OPEN')
+    .order('opened_at', { ascending: false })
+    .limit(1);
 
   if (stationIds.length > 0) {
     pumpsQuery = pumpsQuery.in('station_id', stationIds);
@@ -45,6 +64,22 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const { data: stockRaw } = await stockQuery;
   const { data: shiftRaw } = await shiftQuery;
 
+  // Stats del día actual
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const { data: todaySales } = await supabase
+    .from('fuel_transactions')
+    .select('fuel_type, liters, amount')
+    .in('station_id', stationIds)
+    .gte('completed_at', today.toISOString())
+    .eq('status', 'COMPLETED');
+
+  const todayStats = {
+    totalLiters: todaySales?.reduce((acc, s) => acc + Number(s.liters), 0) ?? 0,
+    totalAmount: todaySales?.reduce((acc, s) => acc + Number(s.amount), 0) ?? 0,
+    txCount: todaySales?.length ?? 0,
+  };
+
   return (
     <DashboardClient
       pumpsRaw={pumpsRaw ?? []}
@@ -52,6 +87,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       shiftRaw={shiftRaw?.[0] ?? null}
       userEmail={user?.email ?? ''}
       tenantName={tenantName}
+      stationIds={stationIds}
+      activeTenantId={activeTenantId}
+      todayStats={todayStats}
     />
   );
 }

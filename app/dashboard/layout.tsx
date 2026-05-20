@@ -21,10 +21,12 @@ export default async function DashboardLayout({
     .single();
 
   const isSuperadmin = profile?.role === 'superadmin';
+  // Para superadmin: tomar tenant del query string; para usuario normal: usar su tenant_id
+  const tenantId = isSuperadmin ? undefined : String(profile?.tenant_id ?? '');
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'row', overflow: 'hidden', backgroundColor: 'var(--bg-base)' }}>
-      <GlobalSidebar isSuperadmin={isSuperadmin} />
+      <GlobalSidebar isSuperadmin={isSuperadmin} tenantId={tenantId} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {children}
       </div>

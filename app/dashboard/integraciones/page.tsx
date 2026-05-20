@@ -25,7 +25,7 @@ export default async function IntegracionesPage({ searchParams }: { searchParams
 
   const { data: tenant } = await supabase
     .from('tenants')
-    .select('id, name, whatsapp_phone_id, gemini_api_key, ai_system_prompt, whatsapp_api_token')
+    .select('id, name, cuit, whatsapp_phone_id, gemini_api_key, ai_system_prompt, whatsapp_api_token, afip_punto_venta, afip_condition, afip_razon_social, afip_cert_status')
     .eq('id', activeTenantId)
     .single();
 
@@ -34,10 +34,15 @@ export default async function IntegracionesPage({ searchParams }: { searchParams
       tenant={{
         id: tenant?.id,
         name: tenant?.name,
+        cuit: tenant?.cuit || '',
         whatsapp_phone_id: tenant?.whatsapp_phone_id || '',
         whatsapp_api_token: tenant?.whatsapp_api_token || '',
         gemini_api_key: tenant?.gemini_api_key || '',
         ai_system_prompt: tenant?.ai_system_prompt || '',
+        afip_punto_venta: tenant?.afip_punto_venta ?? 11,
+        afip_condition: tenant?.afip_condition || 'RI',
+        afip_razon_social: tenant?.afip_razon_social || '',
+        afip_cert_status: tenant?.afip_cert_status || 'MISSING',
       }}
       tenantParam={resolvedParams?.tenant}
     />

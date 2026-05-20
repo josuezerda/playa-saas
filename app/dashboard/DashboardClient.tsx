@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { Fuel, LogOut, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { Fuel, LogOut, WifiOff, RefreshCw, PlayCircle, StopCircle, DollarSign, X, TrendingUp, Activity, Droplets } from 'lucide-react';
 import styles from './dashboard.module.css';
 
 /* ─── Types ─────────────────────────────────────── */
@@ -43,12 +43,17 @@ interface Shift {
   sales_count: number;
 }
 
+interface TodayStats { totalLiters: number; totalAmount: number; txCount: number; }
+
 interface Props {
   pumpsRaw: Pump[];
   stockRaw: StockItem[];
   shiftRaw: Shift | null;
   userEmail: string;
   tenantName: string;
+  stationIds?: number[];
+  activeTenantId?: number | null;
+  todayStats?: TodayStats;
 }
 
 /* ─── Fuel helpers ───────────────────────────────── */
@@ -252,11 +257,135 @@ function Sidebar({ stock, shift }: { stock: StockItem[]; shift: Shift | null }) 
   );
 }
 
+/* ─── Shift Modal ────────────────────────────────── */
+function ShiftModal({ open, onClose, currentShift, stationIds, onDone }: {
+  open: boolean; onClose: () => void; currentShift: Shift | null;
+  stationIds: number[]; onDone: () => void;
+}) {
+  const [operador, setOperador] = useState('');
+  const [loading, setLoading] = useState(false);
+  const supabase = createClient();
+  if (!open) return null;
+
+  const handleOpen = async () => {
+    if (!operador.trim()) return;
+    setLoading(true);
+    const id = `SHIFT-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Date.now()}`;
+    await supabase.from('shifts').insert({ id, station_id: stationIds[0], operator_name: operador, status: 'OPEN' });
+    setLoading(false); onDone(); onClose();
+  };
+
+  const handleClose = async () => {
+    if (!currentShift) return;
+    setLoading(true);
+    await supabase.from('shifts').update({ status: 'CLOSED', closed_at: new Date().toISOString() }).eq('id', currentShift.id);
+    setLoading(false); onDone(); onClose();
+  };
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ background:'#1e2a3a', borderRadius:16, padding:32, width:400, position:'relative' }}>
+        <button onClick={onClose} style={{ position:'absolute', top:16, right:16, background:'none', color:'#94a3b8' }}><X size={20}/></button>
+        <h2 style={{ fontSize:18, fontWeight:700, marginBottom:20, color:'#f1f5f9' }}>
+          {currentShift ? '🛑 Cerrar Turno Activo' : '▶ Abrir Nuevo Turno'}
+        </h2>
+        {!currentShift ? (
+          <>
+            <label style={{ fontSize:12, color:'#94a3b8', fontWeight:600 }}>NOMBRE DEL OPERADOR</label>
+            <input value={operador} onChange={e => setOperador(e.target.value)}
+              placeholder="Ej: Juan Pérez" style={{ width:'100%', marginTop:8, padding:'10px 14px', background:'#0f172a', border:'1px solid #334155', borderRadius:8, color:'#f1f5f9', fontSize:14, boxSizing:'border-box' }}/>
+            <button onClick={handleOpen} disabled={loading || !operador.trim()}
+              style={{ width:'100%', marginTop:16, padding:'12px', background:'#10b981', color:'white', border:'none', borderRadius:8, fontWeight:700, fontSize:14, cursor:'pointer' }}>
+              {loading ? 'Abriendo...' : '▶ Confirmar Apertura'}
+            </button>
+          </>
+        ) : (
+          <>
+            <div style={{ background:'#0f172a', borderRadius:10, padding:16, marginBottom:16, fontSize:13, color:'#94a3b8' }}>
+              <div>Operador: <strong style={{color:'#f1f5f9'}}>{currentShift.operator_name}</strong></div>
+              <div style={{marginTop:8}}>Litros: <strong style={{color:'#f1f5f9'}}>{Number(currentShift.total_liters).toFixed(1)} L</strong></div>
+              <div style={{marginTop:4}}>Monto: <strong style={{color:'#10b981'}}>${Number(currentShift.total_amount).toLocaleString('es-AR')}</strong></div>
+            </div>
+            <button onClick={handleClose} disabled={loading}
+              style={{ width:'100%', padding:'12px', background:'#ef4444', color:'white', border:'none', borderRadius:8, fontWeight:700, fontSize:14, cursor:'pointer' }}>
+              {loading ? 'Cerrando...' : '🛑 Confirmar Cierre de Turno'}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Price Modal ────────────────────────────────── */
+function PriceModal({ open, onClose, stationId, onDone }: {
+  open: boolean; onClose: () => void; stationId: number; onDone: () => void;
+}) {
+  const [prices, setPrices] = useState<Record<string, string>>({});
+  const [nozzles, setNozzles] = useState<{id:number; fuel_type:string; price:number}[]>([]);
+  const [loading, setLoading] = useState(false);
+  const supabase = createClient();
+
+  useEffect(() => {
+    if (!open) return;
+    supabase.from('nozzles').select('id, fuel_type, price').eq('station_id', stationId)
+      .then(({ data }) => {
+        if (!data) return;
+        // deduplicate by fuel_type
+        const seen = new Set<string>();
+        const unique = data.filter(n => { if (seen.has(n.fuel_type)) return false; seen.add(n.fuel_type); return true; });
+        setNozzles(unique);
+        const init: Record<string,string> = {};
+        unique.forEach(n => { init[n.fuel_type] = String(n.price); });
+        setPrices(init);
+      });
+  }, [open, stationId]);
+
+  const LABELS: Record<string,string> = { NAFTA_SUPER:'Nafta Súper', NAFTA_PREMIUM:'Nafta Premium', DIESEL:'Diésel', DIESEL_PREMIUM:'Diésel Premium', GNC:'GNC' };
+
+  const handleSave = async () => {
+    setLoading(true);
+    for (const n of nozzles) {
+      const newPrice = parseFloat(prices[n.fuel_type] || '0');
+      if (newPrice !== n.price) {
+        await supabase.from('nozzles').update({ price: newPrice }).eq('station_id', stationId).eq('fuel_type', n.fuel_type);
+        await supabase.from('price_changes').insert({ station_id: stationId, nozzle_id: n.id, fuel_type: n.fuel_type, old_price: n.price, new_price: newPrice, changed_by: 'admin' });
+      }
+    }
+    setLoading(false); onDone(); onClose();
+  };
+
+  if (!open) return null;
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ background:'#1e2a3a', borderRadius:16, padding:32, width:440, position:'relative' }}>
+        <button onClick={onClose} style={{ position:'absolute', top:16, right:16, background:'none', color:'#94a3b8' }}><X size={20}/></button>
+        <h2 style={{ fontSize:18, fontWeight:700, marginBottom:6, color:'#f1f5f9' }}>💲 Actualizar Precios</h2>
+        <p style={{ fontSize:12, color:'#64748b', marginBottom:20 }}>Los nuevos precios aplican a todos los picos del tipo de combustible.</p>
+        {nozzles.map(n => (
+          <div key={n.fuel_type} style={{ marginBottom:14 }}>
+            <label style={{ fontSize:12, color:'#94a3b8', fontWeight:600 }}>{LABELS[n.fuel_type] ?? n.fuel_type} — Precio actual: ${n.price}</label>
+            <input type="number" value={prices[n.fuel_type] ?? ''} onChange={e => setPrices(p => ({...p, [n.fuel_type]: e.target.value}))}
+              style={{ width:'100%', marginTop:6, padding:'10px 14px', background:'#0f172a', border:'1px solid #334155', borderRadius:8, color:'#f1f5f9', fontSize:14, boxSizing:'border-box' }}/>
+          </div>
+        ))}
+        <button onClick={handleSave} disabled={loading}
+          style={{ width:'100%', marginTop:8, padding:'12px', background:'#3b82f6', color:'white', border:'none', borderRadius:8, fontWeight:700, fontSize:14, cursor:'pointer' }}>
+          {loading ? 'Guardando...' : '💾 Guardar Precios'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main Dashboard ─────────────────────────────── */
-export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail, tenantName }: Props) {
+export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail, tenantName, stationIds = [], activeTenantId, todayStats }: Props) {
   const [pumps, setPumps] = useState<Pump[]>(pumpsRaw);
+  const [shift, setShift] = useState<Shift | null>(shiftRaw);
   const [connected, setConnected] = useState(true);
   const [time, setTime] = useState('');
+  const [showShiftModal, setShowShiftModal] = useState(false);
+  const [showPriceModal, setShowPriceModal] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -279,6 +408,9 @@ export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail, tenan
 
   return (
     <div className={styles.app}>
+      <ShiftModal open={showShiftModal} onClose={() => setShowShiftModal(false)} currentShift={shift} stationIds={stationIds} onDone={refresh} />
+      <PriceModal open={showPriceModal} onClose={() => setShowPriceModal(false)} stationId={stationIds[0] ?? 1} onDone={refresh} />
+
       {/* ── Header ── */}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
@@ -295,6 +427,26 @@ export function DashboardClient({ pumpsRaw, stockRaw, shiftRaw, userEmail, tenan
         </div>
 
         <div className={styles.headerRight}>
+          {/* Stats del día */}
+          {todayStats && (
+            <>
+              <div className={styles.badge} style={{gap:6}}><Droplets size={12}/>{todayStats.totalLiters.toFixed(0)} L hoy</div>
+              <div className={styles.badge} style={{gap:6, color:'#10b981'}}><TrendingUp size={12}/>$ {todayStats.totalAmount.toLocaleString('es-AR',{maximumFractionDigits:0})} hoy</div>
+            </>
+          )}
+          {/* Turno */}
+          <button onClick={() => setShowShiftModal(true)}
+            style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 12px', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:12,
+              background: shift ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)',
+              color: shift ? '#ef4444' : '#10b981' }}>
+            {shift ? <StopCircle size={14}/> : <PlayCircle size={14}/>}
+            {shift ? 'Cerrar Turno' : 'Abrir Turno'}
+          </button>
+          {/* Precios */}
+          <button onClick={() => setShowPriceModal(true)}
+            style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 12px', borderRadius:8, border:'none', cursor:'pointer', fontWeight:600, fontSize:12, background:'rgba(59,130,246,0.15)', color:'#3b82f6' }}>
+            <DollarSign size={14}/> Precios
+          </button>
           {connected
             ? <div className={styles.badge}><span className={styles.dot} />VOX Conectada</div>
             : <div className={`${styles.badge} ${styles.badgeRed}`}><WifiOff size={12} />Desconectada</div>

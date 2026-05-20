@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Fuel, Users, Receipt, Link2, Settings, MessageSquare, ArrowLeft, LogOut } from 'lucide-react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { Fuel, Users, Receipt, Link2, Settings, MessageSquare, ArrowLeft, LogOut, FileSpreadsheet } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import styles from './sidebar.module.css';
@@ -10,6 +10,7 @@ import styles from './sidebar.module.css';
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Panel de Control', icon: Fuel },
   { href: '/dashboard/empleados', label: 'Empleados y Roles', icon: Users },
+  { href: '/dashboard/planillas', label: 'Planillas y Reportes', icon: FileSpreadsheet },
   { href: '/dashboard/crm', label: 'CRM — Clientes', icon: MessageSquare },
   { href: '/dashboard/facturacion', label: 'Facturación AFIP', icon: Receipt },
   { href: '/dashboard/integraciones', label: 'Integraciones', icon: Link2 },
@@ -24,7 +25,10 @@ interface GlobalSidebarProps {
 export default function GlobalSidebar({ isSuperadmin, tenantId }: GlobalSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const tenantQueryString = tenantId ? `?tenant=${tenantId}` : '';
+  const searchParams = useSearchParams();
+  // Prioridad: 1) URL ?tenant=X, 2) prop tenantId del layout
+  const activeTenant = searchParams.get('tenant') || tenantId || '';
+  const tenantQueryString = activeTenant ? `?tenant=${activeTenant}` : '';
 
   const handleLogout = async () => {
     const supabase = createClient();
